@@ -1,4 +1,6 @@
+import 'package:cep_list/pages/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MainApp());
@@ -9,12 +11,13 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color.fromARGB(0, 0, 129, 72)),
+            textTheme: GoogleFonts.poppinsTextTheme(),
+            scaffoldBackgroundColor: Colors.grey[300]),
+        home: const HomePage());
   }
 }
