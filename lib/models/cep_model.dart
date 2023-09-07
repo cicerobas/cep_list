@@ -22,6 +22,8 @@ class CEPModel {
       this.ddd,
       this.siafi});
 
+  CEPModel.empty();
+
   CEPModel.fromJson(Map<String, dynamic> json) {
     cep = json['cep'];
     logradouro = json['logradouro'];
