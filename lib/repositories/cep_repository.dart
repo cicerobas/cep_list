@@ -7,6 +7,7 @@ class CEPRepository {
   Future<CEPModel> getCepData(String cep) async {
     var response =
         await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
+
     if (response.body.contains('erro')) {
       return CEPModel.empty();
     }

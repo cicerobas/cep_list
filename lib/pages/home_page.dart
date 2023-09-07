@@ -40,18 +40,88 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                 ),
               )
-            : ListView.builder(
-                itemCount: savedCepData.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Container(
-                      color: Colors.amber,
-                      height: 150,
-                    ),
-                  );
-                },
+            : Padding(
+                padding: const EdgeInsets.all(10),
+                child: ListView.builder(
+                  itemCount: savedCepData.length,
+                  itemBuilder: (context, index) {
+                    var cepData = savedCepData[index];
+                    return Card(
+                        child: ExpansionTile(
+                      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                      childrenPadding: const EdgeInsets.all(10),
+                      expandedAlignment: Alignment.centerLeft,
+                      //expandedAlignment: Alignment.bottomLeft,
+                      title: Text(
+                        cepData.cep!,
+                        style: _cepDataTextStyle().copyWith(fontSize: 20),
+                      ),
+                      subtitle: Text(
+                        cepData.logradouro!,
+                        style: _cepDataTextStyle().copyWith(fontSize: 16),
+                      ),
+                      children: [
+                        Text(
+                          'Complemento: ${cepData.complemento!}',
+                          style: _cepDataTextStyle(),
+                        ),
+                        const Divider(),
+                        Text(
+                          'Bairro: ${cepData.bairro!}',
+                          style: _cepDataTextStyle(),
+                        ),
+                        const Divider(),
+                        Text(
+                          'Localidade: ${cepData.localidade!}',
+                          style: _cepDataTextStyle(),
+                        ),
+                        const Divider(),
+                        Text(
+                          'UF: ${cepData.uf!}',
+                          style: _cepDataTextStyle(),
+                        ),
+                        const Divider(),
+                        Text(
+                          'IBGE: ${cepData.ibge!}',
+                          style: _cepDataTextStyle(),
+                        ),
+                        const Divider(),
+                        Text(
+                          'GIA: ${cepData.gia!}',
+                          style: _cepDataTextStyle(),
+                        ),
+                        const Divider(),
+                        Text(
+                          'DDD: ${cepData.ddd!}',
+                          style: _cepDataTextStyle(),
+                        ),
+                        const Divider(),
+                        Text(
+                          'SIAFI: ${cepData.siafi!}',
+                          style: _cepDataTextStyle(),
+                        ),
+                        const Divider(),
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: SizedBox(
+                              width: 28,
+                              height: 28,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(50),
+                                onTap: () {},
+                                child: const Icon(Icons.delete),
+                              ),
+                            )),
+                      ],
+                    ));
+                  },
+                ),
               ));
+  }
+
+  TextStyle _cepDataTextStyle() {
+    return const TextStyle(
+        fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 0.5);
   }
 
   void _displayCepDialog(BuildContext context) async {
