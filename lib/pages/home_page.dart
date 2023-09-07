@@ -1,3 +1,4 @@
+import 'package:cep_list/repositories/cep_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -10,6 +11,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final cepController = TextEditingController();
+  final cepRepository = CEPRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -24,28 +26,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           cepController.text = '';
-          showDialog(
-              context: context,
-              builder: (_) {
-                return AlertDialog(
-                  title: const Text('Busca CEP', textAlign: TextAlign.center),
-                  content: TextField(
-                    controller: cepController,
-                    maxLength: 8,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                      hintText: ' Apenas números',
-                    ),
-                    onChanged: (String value) {
-                      if (value.length == 8) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                      }
-                    },
-                  ),
-                );
-              });
+          _displayCepDialog(context);
         },
         child: const Icon(Icons.search, size: 30),
       ),
@@ -56,5 +37,45 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void _displayCepDialog(BuildContext context) async {
+    bool isLoading = false;
+    return showDialog(
+        context: context,
+        builder: (_) {
+          return StatefulBuilder(builder: (_, setState) {
+            return AlertDialog(
+              title: const Text('Busca CEP', textAlign: TextAlign.center),
+              content: Wrap(
+                children: [
+                  TextField(
+                    controller: cepController,
+                    maxLength: 8,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      hintText: ' Apenas números',
+                    ),
+                    onChanged: (String value) async {
+                      if (value.length == 8) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        setState(() => isLoading = !isLoading);
+                        var resp = await cepRepository.getCepData(value);
+                        await Future.delayed(const Duration(seconds: 1));
+                        debugPrint(resp);
+                        setState(() => isLoading = !isLoading);
+                      }
+                    },
+                  ),
+                  Visibility(
+                      visible: isLoading,
+                      child: const Center(child: CircularProgressIndicator())),
+                ],
+              ),
+            );
+          });
+        });
   }
 }
