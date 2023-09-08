@@ -184,7 +184,10 @@ class _HomePageState extends State<HomePage> {
                               isThreeLine: true,
                               trailing: IconButton(
                                   color: Colors.green,
-                                  onPressed: () => _saveCepData(),
+                                  onPressed: () {
+                                    _saveCepData();
+                                    Navigator.pop(context);
+                                  },
                                   icon: const Icon(Icons.save)),
                             ))
                 ],
@@ -199,10 +202,11 @@ class _HomePageState extends State<HomePage> {
     return await cepRepository.getCepData(value);
   }
 
-  _saveCepData() {
+  _saveCepData() async {
     setState(() {
       savedCepData.add(cepModel);
     });
-    Navigator.pop(context);
+    var status = await cepRepository.saveCepData(cepModel);
+    debugPrint('STATUS: $status');
   }
 }
