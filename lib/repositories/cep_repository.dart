@@ -9,6 +9,16 @@ class CEPRepository {
   final _customDio = CustomDio();
 
   Future<CEPModel> getCepData(String cep) async {
+    var formatedCep = '${cep.substring(0, 5)}-${cep.substring(5, 8)}';
+    var response = await _customDio.dio.get('?where={"cep":"$formatedCep"}');
+    var result = SavedCepsModel.fromJson(response.data);
+    if (result.results.isEmpty) {
+      return _getCepFromApi(cep);
+    }
+    return result.results[0];
+  }
+
+  Future<CEPModel> _getCepFromApi(String cep) async {
     var response =
         await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
 
