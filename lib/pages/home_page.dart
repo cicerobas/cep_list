@@ -1,4 +1,5 @@
 import 'package:cep_list/models/cep_model.dart';
+import 'package:cep_list/models/saved_ceps_model.dart';
 import 'package:cep_list/repositories/cep_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +15,13 @@ class _HomePageState extends State<HomePage> {
   final cepController = TextEditingController();
   final cepRepository = CEPRepository();
   var cepModel = CEPModel();
-  List<CEPModel> savedCepData = [];
+  var savedCepData = SavedCepsModel([]);
+
+  @override
+  void initState() {
+    _loadSavedCeps();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +40,7 @@ class _HomePageState extends State<HomePage> {
           },
           child: const Icon(Icons.search, size: 30),
         ),
-        body: savedCepData.isEmpty
+        body: savedCepData.results.isEmpty
             ? const Center(
                 child: Text(
                   'Nenhum Registro',
@@ -43,9 +50,9 @@ class _HomePageState extends State<HomePage> {
             : Padding(
                 padding: const EdgeInsets.all(10),
                 child: ListView.builder(
-                  itemCount: savedCepData.length,
+                  itemCount: savedCepData.results.length,
                   itemBuilder: (context, index) {
-                    var cepData = savedCepData[index];
+                    var cepData = savedCepData.results[index];
                     return Card(
                         child: ExpansionTile(
                       expandedCrossAxisAlignment: CrossAxisAlignment.start,
@@ -203,10 +210,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   _saveCepData() async {
-    setState(() {
-      savedCepData.add(cepModel);
-    });
-    var status = await cepRepository.saveCepData(cepModel);
-    debugPrint('STATUS: $status');
+    await cepRepository.saveCepData(cepModel);
+    _loadSavedCeps();
+    setState(() {});
+  }
+
+  _loadSavedCeps() async {
+    savedCepData = await cepRepository.getSavedCepList();
+    setState(() {});
   }
 }

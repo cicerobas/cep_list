@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cep_list/models/saved_ceps_model.dart';
 import 'package:cep_list/services/custom_dio.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,6 +16,11 @@ class CEPRepository {
       return CEPModel.empty();
     }
     return CEPModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SavedCepsModel> getSavedCepList() async {
+    var response = await _customDio.dio.get('');
+    return SavedCepsModel.fromJson(response.data);
   }
 
   saveCepData(CEPModel cepModel) async {
