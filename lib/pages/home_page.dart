@@ -109,13 +109,15 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const Divider(),
                         Align(
-                            alignment: Alignment.centerRight,
+                            alignment: Alignment.centerLeft,
                             child: SizedBox(
                               width: 28,
                               height: 28,
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(50),
-                                onTap: () {},
+                                onTap: () {
+                                  _deleteCepData(cepData.objectId!);
+                                },
                                 child: const Icon(Icons.delete),
                               ),
                             )),
@@ -212,7 +214,11 @@ class _HomePageState extends State<HomePage> {
   _saveCepData() async {
     await cepRepository.saveCepData(cepModel);
     _loadSavedCeps();
-    setState(() {});
+  }
+
+  _deleteCepData(String objectId) async {
+    await cepRepository.deleteCepData(objectId);
+    _loadSavedCeps();
   }
 
   _loadSavedCeps() async {

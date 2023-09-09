@@ -1,4 +1,5 @@
 class CEPModel {
+  String? objectId;
   String? cep;
   String? logradouro;
   String? complemento;
@@ -25,6 +26,7 @@ class CEPModel {
   CEPModel.empty();
 
   CEPModel.fromJson(Map<String, dynamic> json) {
+    objectId = json['objectId'];
     cep = json['cep'];
     logradouro = json['logradouro'];
     complemento = json['complemento'];
@@ -39,6 +41,7 @@ class CEPModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['objectId'] = objectId;
     data['cep'] = cep;
     data['logradouro'] = logradouro;
     data['complemento'] = complemento;

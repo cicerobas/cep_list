@@ -24,8 +24,10 @@ class CEPRepository {
   }
 
   saveCepData(CEPModel cepModel) async {
-    var response =
-        await _customDio.dio.post('', data: jsonEncode(cepModel.toJson()));
-    return response.statusCode;
+    await _customDio.dio.post('', data: jsonEncode(cepModel.toJson()));
+  }
+
+  deleteCepData(String id) async {
+    await _customDio.dio.delete('/$id');
   }
 }
