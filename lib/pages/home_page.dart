@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final cepController = TextEditingController();
   final cepRepository = CEPRepository();
+  String cepToExpand = '';
   var cepModel = CEPModel();
   var savedCepData = SavedCepsModel([]);
 
@@ -50,87 +51,84 @@ class _HomePageState extends State<HomePage> {
             : Padding(
                 padding: const EdgeInsets.all(10),
                 child: ListView.builder(
+                  key: Key(cepToExpand),
                   itemCount: savedCepData.results.length,
                   itemBuilder: (context, index) {
                     var cepData = savedCepData.results[index];
                     return Card(
+                        key: ValueKey(index),
                         child: ExpansionTile(
-                      expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                      childrenPadding: const EdgeInsets.all(10),
-                      expandedAlignment: Alignment.centerLeft,
-                      //expandedAlignment: Alignment.bottomLeft,
-                      title: Text(
-                        cepData.cep!,
-                        style: _cepDataTextStyle().copyWith(fontSize: 20),
-                      ),
-                      subtitle: Text(
-                        cepData.logradouro!,
-                        style: _cepDataTextStyle().copyWith(fontSize: 16),
-                      ),
-                      children: [
-                        Text(
-                          'Complemento: ${cepData.complemento!}',
-                          style: _cepDataTextStyle(),
-                        ),
-                        const Divider(),
-                        Text(
-                          'Bairro: ${cepData.bairro!}',
-                          style: _cepDataTextStyle(),
-                        ),
-                        const Divider(),
-                        Text(
-                          'Localidade: ${cepData.localidade!}',
-                          style: _cepDataTextStyle(),
-                        ),
-                        const Divider(),
-                        Text(
-                          'UF: ${cepData.uf!}',
-                          style: _cepDataTextStyle(),
-                        ),
-                        const Divider(),
-                        Text(
-                          'IBGE: ${cepData.ibge!}',
-                          style: _cepDataTextStyle(),
-                        ),
-                        const Divider(),
-                        Text(
-                          'GIA: ${cepData.gia!}',
-                          style: _cepDataTextStyle(),
-                        ),
-                        const Divider(),
-                        Text(
-                          'DDD: ${cepData.ddd!}',
-                          style: _cepDataTextStyle(),
-                        ),
-                        const Divider(),
-                        Text(
-                          'SIAFI: ${cepData.siafi!}',
-                          style: _cepDataTextStyle(),
-                        ),
-                        const Divider(),
-                        Align(
-                            alignment: Alignment.centerLeft,
-                            child: SizedBox(
-                              width: 28,
-                              height: 28,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(50),
-                                onTap: () {
-                                  _deleteCepData(cepData.objectId!);
-                                },
-                                child: const Icon(Icons.delete),
-                              ),
-                            )),
-                      ],
-                    ));
+                          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                          childrenPadding: const EdgeInsets.all(10),
+                          expandedAlignment: Alignment.centerLeft,
+                          initiallyExpanded: cepData.cep! == cepToExpand,
+                          title: Text(
+                            cepData.cep!,
+                            style: _cepDataTextStyle().copyWith(fontSize: 20),
+                          ),
+                          subtitle: Text(
+                            cepData.logradouro!,
+                            style: _cepDataTextStyle().copyWith(fontSize: 16),
+                          ),
+                          children: [
+                            Text(
+                              'Complemento: ${cepData.complemento!}',
+                              style: _cepDataTextStyle(),
+                            ),
+                            const Divider(),
+                            Text(
+                              'Bairro: ${cepData.bairro!}',
+                              style: _cepDataTextStyle(),
+                            ),
+                            const Divider(),
+                            Text(
+                              'Localidade: ${cepData.localidade!}',
+                              style: _cepDataTextStyle(),
+                            ),
+                            const Divider(),
+                            Text(
+                              'UF: ${cepData.uf!}',
+                              style: _cepDataTextStyle(),
+                            ),
+                            const Divider(),
+                            Text(
+                              'IBGE: ${cepData.ibge!}',
+                              style: _cepDataTextStyle(),
+                            ),
+                            const Divider(),
+                            Text(
+                              'GIA: ${cepData.gia!}',
+                              style: _cepDataTextStyle(),
+                            ),
+                            const Divider(),
+                            Text(
+                              'DDD: ${cepData.ddd!}',
+                              style: _cepDataTextStyle(),
+                            ),
+                            const Divider(),
+                            Text(
+                              'SIAFI: ${cepData.siafi!}',
+                              style: _cepDataTextStyle(),
+                            ),
+                            const Divider(),
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: SizedBox(
+                                  width: 28,
+                                  height: 28,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(50),
+                                    onTap: () {
+                                      _deleteCepData(cepData.objectId!);
+                                    },
+                                    child: const Icon(Icons.delete),
+                                  ),
+                                )),
+                          ],
+                        ));
                   },
                 ),
               ));
-  }
-
-  TextStyle _cepDataTextStyle() {
-    return const TextStyle(
-        fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 0.5);
   }
 
   void _displayCepDialog(BuildContext context) async {
@@ -164,8 +162,11 @@ class _HomePageState extends State<HomePage> {
                           isLoading = !isLoading;
                         });
                         var response = await _loadCepData(value);
+                        if (response.$2) {
+                          _expandCepTile(response.$1.cep!);
+                        }
                         setState(() {
-                          cepModel = response;
+                          cepModel = response.$1;
                           isLoading = !isLoading;
                           isLoaded = true;
                         });
@@ -206,23 +207,46 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  Future _loadCepData(String value) async {
-    await Future.delayed(const Duration(seconds: 1)); //TIRAR DEPOIS
-    return await cepRepository.getCepData(value);
+  TextStyle _cepDataTextStyle() {
+    return const TextStyle(
+        fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 0.5);
+  }
+
+  Future<(CEPModel, bool)> _loadCepData(String value) async {
+    var result = await cepRepository.getCepData(value);
+    return result;
   }
 
   _saveCepData() async {
     await cepRepository.saveCepData(cepModel);
+    cepToExpand = cepModel.cep!;
     _loadSavedCeps();
   }
 
   _deleteCepData(String objectId) async {
     await cepRepository.deleteCepData(objectId);
+    cepToExpand = '';
     _loadSavedCeps();
   }
 
   _loadSavedCeps() async {
     savedCepData = await cepRepository.getSavedCepList();
+    _showItemFirst();
     setState(() {});
+  }
+
+  _expandCepTile(String cep) async {
+    Navigator.pop(context);
+    cepToExpand = cep;
+    _showItemFirst();
+    setState(() {});
+  }
+
+  _showItemFirst() {
+    if (cepToExpand != '') {
+      var temp = savedCepData.results.removeAt(
+          savedCepData.results.indexWhere(((e) => e.cep == cepToExpand)));
+      savedCepData.results.insert(0, temp);
+    }
   }
 }

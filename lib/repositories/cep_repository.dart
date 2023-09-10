@@ -8,14 +8,14 @@ import 'package:cep_list/models/cep_model.dart';
 class CEPRepository {
   final _customDio = CustomDio();
 
-  Future<CEPModel> getCepData(String cep) async {
+  Future<(CEPModel, bool)> getCepData(String cep) async {
     var formatedCep = '${cep.substring(0, 5)}-${cep.substring(5, 8)}';
     var response = await _customDio.dio.get('?where={"cep":"$formatedCep"}');
     var result = SavedCepsModel.fromJson(response.data);
     if (result.results.isEmpty) {
-      return _getCepFromApi(cep);
+      return (await _getCepFromApi(cep), false);
     }
-    return result.results[0];
+    return (result.results[0], true);
   }
 
   Future<CEPModel> _getCepFromApi(String cep) async {
